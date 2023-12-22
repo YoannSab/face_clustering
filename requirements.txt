@@ -8,3 +8,5 @@ Pillow
 requests
 psutil
 flask
+keras_facenet
+rawpy
