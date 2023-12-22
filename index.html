@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Application pour maman</title>
+    <link rel="stylesheet" type="text/css" href="./static/css/style.css">
+</head>
+<body>
+    <h1>Application de reconnaissance de visage sur les photos</h1>
+    <div class="tabs">
+        <button class="tab-button" onclick="openTab(event, 'Clusterisation')">Reconnaissance faciale</button>
+        <button class="tab-button" onclick="openTab(event, 'Recherche')">Recherche dans les photos</button>
+    </div>
+
+        <!-- Onglet Clusterisation -->
+    <div id="Clusterisation" class="tab-content">
+        <form id="clusterForm" class="form-style">
+            <input type="text" id="folderNameCluster" placeholder="Nom du dossier contenant les photos">
+            <button type="submit">Reconnaitre</button>
+        </form>
+        <div id="clusterResults">
+            <div id="loadingProgress" style="display:none;">
+                <div id="progressBar" style="width:0%;"></div>
+            </div>
+            
+            <!-- Les résultats de clusterisation seront affichés ici -->
+        </div>
+    </div>
+
+    <!-- Onglet Recherche -->
+    <div id="Recherche" class="tab-content">
+        <form id="searchForm" class="form-style">
+            <input type="text" id="folderNameSearch" placeholder="Nom du dossier pour la recherche">
+            <input type="text" id="personName" placeholder="Nom de la personne">
+            <button type="submit">Rechercher</button>
+        </form>
+        <div id="searchResults">
+            <!-- Les résultats de recherche seront affichés ici -->
+        </div>
+    </div>
+
+
+    <script src="./static/js/app.js"></script>
+
+</body>
+</html>

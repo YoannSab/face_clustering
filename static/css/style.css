@@ -1,0 +1,183 @@
+/* Styles existants de la deuxième page */
+
+/* Styles pour les onglets */
+.tabs {
+    overflow: hidden;
+    background-color: #f1f1f1;
+    margin-top: 20px;
+}
+
+.tab-button {
+    background-color: inherit;
+    float: left;
+    border: none;
+    outline: none;
+    cursor: pointer;
+    padding: 14px 16px;
+    transition: 0.3s;
+    font-size: 17px;
+}
+
+.tab-button:hover {
+    background-color: #ddd;
+}
+
+.tab-button.active {
+    background-color: #ccc;
+}
+
+.tab-content {
+    display: none;
+    padding: 6px 12px;
+    border: 1px solid #ccc;
+    border-top: none;
+}
+
+.styled-input {
+    width: 100%; /* Full-width */
+    padding: 10px; /* Some padding */
+    margin: 10px 0; /* Margin top and bottom */
+    box-sizing: border-box; /* Include padding in total width and height */
+    border: 2px solid #ccc; /* Light grey border */
+    border-radius: 4px; /* Rounded borders */
+    background-color: #f8f8f8; /* Light grey background */
+    font-size: 16px; /* Increase font size */
+}
+.images-container {
+    display: flex;
+    /* flex-wrap: wrap; */
+    height: 200px;
+    padding: 10px;
+    /* box-sizing: border-box; */
+}
+
+.cluster-div {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: fit-content; /* Adjust this to set a specific width */
+    margin: 10px;
+    flex-grow: 1;
+}
+
+.bottom-div {
+    width: 100%;
+    background-color: #f8f8f8; /* Adjust background color as needed */
+    padding: 10px;
+    box-sizing: border-box;
+    text-align: center; /* Center the text if needed */
+}
+
+.clusters-container {
+    display: flex;
+    flex-wrap: wrap;
+    margin-top: 20px;
+}
+
+@media (max-width: 600px) {
+    .item {
+        flex-basis: 100%; /* Each element takes full width on small screens */
+    }
+}
+
+.responsive-image {
+    max-height: 100px; /* Adjust as needed */
+    margin-right: 10px;
+}
+
+.responsive-image {
+    max-height: 100%;
+    max-width: none;
+    margin-right: 10px;
+}
+
+.responsive-image-search {
+    height: 200px;
+    width: auto;
+    margin-right: 10px;
+    cursor: pointer;
+}
+
+/* Styles communs pour les formulaires */
+.form-style {
+    margin: 20px;
+    padding: 20px;
+    background-color: white;
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    text-align: center;
+}
+
+.form-style input[type="text"] {
+    width: 70%;
+    padding: 10px;
+    margin: 10px 0;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+}
+
+.form-style button {
+    width: 30%;
+    padding: 10px;
+    border: none;
+    border-radius: 4px;
+    background-color: #4CAF50;
+    color: white;
+    cursor: pointer;
+    font-size: 16px;
+}
+
+.form-style button:hover {
+    background-color: #45a049;
+}
+
+.button {
+    width: 50%;
+    padding: 10px;
+    border: none;
+    border-radius: 4px;
+    background-color: #ddd;
+    color: rgb(0, 0, 0);
+    cursor: pointer;
+    font-size: 25px;
+    /* center */
+    display: block;
+    margin-left: auto;
+    margin-right: auto;
+
+}
+.button:hover {
+    background-color: #ccc;
+}
+.title{
+    text-align: center;
+    font-size: 30px;
+    font-weight: bold;
+    margin-bottom: 20px;
+    display: block;
+    margin-left: auto;
+    margin-right: auto;
+}
+/* Style for the outer container of the progress bar */
+#loadingProgress {
+    width: 100%;
+    background-color: #ddd;
+    border-radius: 4px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+    margin: 20px 0;
+    overflow: hidden;
+    display: none;
+}
+
+/* Style for the actual progress bar */
+#progressBar {
+    height: 20px;
+    width: 0%;
+    background-color: #4caf50; /* Green color */
+    text-align: center; /* For optional text inside the progress bar */
+    line-height: 20px; /* Align text vertically */
+    color: white;
+    border-radius: 4px;
+    transition: width 0.4s ease-in-out; /* Smooth transition for width change */
+}
+
