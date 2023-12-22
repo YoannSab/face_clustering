@@ -262,7 +262,7 @@ document.getElementById('clusterForm').addEventListener('submit', function (e) {
     .then(data => {
       console.log(data);
       alert(`Nombre d'images: ${parseInt(data["number_of_images"])}`)
-      updateProgressBar(parseInt(data["number_of_images"]) * 1000);
+      updateProgressBar(parseInt(data["number_of_images"]) * 1500);
       findClusters(folderName);
     })
     .catch(error => console.error('Error:', error));

@@ -47,9 +47,9 @@ def find_faces(image_path:str):
             app.logger.error(f"Erreur lors de la lecture de l'image {image_path}")
             return []
         image = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
-        if image.shape[0] > 800 or image.shape[1] > 800:
-            image = cv2.resize(image, (int(image.shape[1]*(700/image.shape[0])) , 
-                                       int(image.shape[0]* (700/image.shape[0]))))
+        if image.shape[0] > 1300 or image.shape[1] > 1300:
+            image = cv2.resize(image, (int(image.shape[1]*(1200/image.shape[0])) , 
+                                       int(image.shape[0]* (1200/image.shape[0]))))
 
 
         detections = embedder.extract(image, threshold=0.95)
@@ -89,9 +89,9 @@ def convert_to_base64(image_path: str, face_box: List[int]):
         app.logger.error(f"Erreur lors de la lecture de l'image (convert b64) {image_path}")
         return "", False
     image = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
-    if image.shape[0] > 800 or image.shape[1] > 800:
-        image = cv2.resize(image, (int(image.shape[1]*(700/image.shape[0])) , 
-                                    int(image.shape[0]* (700/image.shape[0]))))
+    if image.shape[0] > 1300 or image.shape[1] > 1300:
+        image = cv2.resize(image, (int(image.shape[1]*(1200/image.shape[0])) , 
+                                    int(image.shape[0]* (1200/image.shape[0]))))
     x, y, w, h = face_box
     cropped_image = image[y:y+h, x:x+w]
     _, buffer = cv2.imencode('.jpg', cropped_image)
