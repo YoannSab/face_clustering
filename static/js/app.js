@@ -262,7 +262,7 @@ document.getElementById('clusterForm').addEventListener('submit', function (e) {
     .then(data => {
       console.log(data);
       alert(`Nombre d'images: ${parseInt(data["number_of_images"])}`)
-      updateProgressBar(parseInt(data["number_of_images"]) * 1500);
+      updateProgressBar(parseInt(data["number_of_images"]) * 800);
       findClusters(folderName);
     })
     .catch(error => console.error('Error:', error));
@@ -283,7 +283,7 @@ function findClusters(folderName) {
       headers: {
           'Content-Type': 'application/json'
       },
-      body: JSON.stringify({ fname: folderName })
+      body: JSON.stringify({ fname: folderName, dbscan_eps : 0.9, dbscan_min_samples: 5 })
   })
   .then(response => response.json())
   .then(data => {

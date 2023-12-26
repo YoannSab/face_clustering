@@ -10,3 +10,5 @@ psutil
 flask
 keras_facenet
 rawpy
+falsk_cors
+
