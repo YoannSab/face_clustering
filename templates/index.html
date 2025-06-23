@@ -1,0 +1,283 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">    <title>Face Clustering - Reconnaissance Faciale</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/modern-style.css') }}">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+    <!-- Navigation Header -->
+    <header class="app-header">
+        <div class="container">
+            <div class="header-content">
+                <div class="logo">
+                    <i class="fas fa-search"></i>
+                    <span>FaceCluster</span>
+                </div>
+                <nav class="main-nav">
+                    <button class="nav-btn active" data-tab="clustering">
+                        <i class="fas fa-users"></i>
+                        Reconnaissance
+                    </button>
+                    <button class="nav-btn" data-tab="search">
+                        <i class="fas fa-search"></i>
+                        Recherche
+                    </button>
+                </nav>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="main-content">
+        <div class="container">
+            
+            <!-- Clustering Tab -->
+            <section id="clustering-tab" class="tab-content active">
+                <div class="section-header">
+                    <h1>Reconnaissance Faciale</h1>
+                    <p class="section-description">
+                        Analysez automatiquement vos photos pour identifier et regrouper les visages
+                    </p>
+                </div>
+
+                <div class="content-grid">
+                    <!-- Configuration Panel -->
+                    <div class="config-panel">
+                        <div class="card">
+                            <h3><i class="fas fa-cog"></i> Configuration</h3>
+                            
+                            <form id="clustering-form" class="form-modern">
+                                <div class="form-group">
+                                    <label for="directory-input">
+                                        <i class="fas fa-folder"></i>
+                                        Dossier des photos
+                                    </label>
+                                    <div class="input-group">
+                                        <input type="text" 
+                                               id="directory-input" 
+                                               class="form-input" 
+                                               placeholder="C:\\Users\\Photos\\Famille"
+                                               required>
+                                        <button type="button" class="btn-secondary" id="browse-btn">
+                                            <i class="fas fa-folder-open"></i>
+                                        </button>
+                                    </div>
+                                    <div class="image-count" id="image-count"></div>
+                                </div>
+
+                                <div class="form-group">
+                                    <label for="algorithm-select">
+                                        <i class="fas fa-brain"></i>
+                                        Algorithme de clustering
+                                    </label>
+                                    <select id="algorithm-select" class="form-select">
+                                        <option value="dbscan">DBSCAN (Recommandé)</option>
+                                        <option value="kmeans">K-Means</option>
+                                        <option value="hierarchical">Clustering Hiérarchique</option>
+                                    </select>
+                                </div>
+
+                                <div class="algorithm-params" id="dbscan-params">
+                                    <div class="param-row">
+                                        <div class="form-group">
+                                            <label for="eps-input">Epsilon (Similarité)</label>
+                                            <input type="range" 
+                                                   id="eps-input" 
+                                                   class="form-range"
+                                                   min="0.3" 
+                                                   max="1.0" 
+                                                   step="0.05" 
+                                                   value="0.65">
+                                            <span class="range-value" id="eps-value">0.65</span>
+                                        </div>
+                                        <div class="form-group">
+                                            <label for="min-samples-input">Min. échantillons</label>
+                                            <input type="number" 
+                                                   id="min-samples-input" 
+                                                   class="form-input"
+                                                   min="2" 
+                                                   max="10" 
+                                                   value="3">
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="algorithm-params" id="kmeans-params" style="display: none;">
+                                    <div class="form-group">
+                                        <label for="clusters-input">Nombre de clusters</label>
+                                        <input type="number" 
+                                               id="clusters-input" 
+                                               class="form-input"
+                                               min="2" 
+                                               max="50" 
+                                               value="20">
+                                    </div>
+                                </div>
+
+                                <button type="submit" class="btn-primary btn-large">
+                                    <i class="fas fa-play"></i>
+                                    Démarrer l'analyse
+                                </button>
+                            </form>
+                        </div>
+                    </div>
+
+                    <!-- Progress Panel -->
+                    <div class="progress-panel" id="progress-panel" style="display: none;">
+                        <div class="card">
+                            <h3><i class="fas fa-spinner fa-spin"></i> Analyse en cours...</h3>
+                            
+                            <div class="progress-container">
+                                <div class="progress-bar">
+                                    <div class="progress-fill" id="progress-fill"></div>
+                                </div>
+                                <div class="progress-text" id="progress-text">Initialisation...</div>
+                            </div>
+
+                            <div class="progress-stats">
+                                <div class="stat">
+                                    <span class="stat-value" id="processed-count">0</span>
+                                    <span class="stat-label">Images traitées</span>
+                                </div>
+                                <div class="stat">
+                                    <span class="stat-value" id="faces-found">0</span>
+                                    <span class="stat-label">Visages détectés</span>
+                                </div>
+                                <div class="stat">
+                                    <span class="stat-value" id="estimated-time">--</span>
+                                    <span class="stat-label">Temps restant</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Results Section -->
+                <div class="results-section" id="results-section" style="display: none;">
+                    <div class="results-header">
+                        <h2 id="results-title">Résultats de l'analyse</h2>
+                        <div class="results-actions">
+                            <button class="btn-secondary" id="export-btn">
+                                <i class="fas fa-download"></i>
+                                Exporter
+                            </button>
+                            <button class="btn-primary" id="save-metadata-btn">
+                                <i class="fas fa-tags"></i>
+                                Sauvegarder les noms
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="results-stats">
+                        <div class="stat-card">
+                            <div class="stat-number" id="total-faces">0</div>
+                            <div class="stat-label">Visages détectés</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-number" id="clustered-faces">0</div>
+                            <div class="stat-label">Visages groupés</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-number" id="num-clusters">0</div>
+                            <div class="stat-label">Personnes identifiées</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-number" id="clustering-rate">0%</div>
+                            <div class="stat-label">Taux de réussite</div>
+                        </div>
+                    </div>
+
+                    <div class="clusters-grid" id="clusters-grid">
+                        <!-- Clusters will be dynamically generated here -->
+                    </div>
+                </div>
+            </section>
+
+            <!-- Search Tab -->
+            <section id="search-tab" class="tab-content">
+                <div class="section-header">
+                    <h1>Recherche de Photos</h1>
+                    <p class="section-description">
+                        Trouvez rapidement toutes les photos contenant une personne spécifique
+                    </p>
+                </div>
+
+                <div class="search-panel">
+                    <div class="card">
+                        <form id="search-form" class="form-modern">
+                            <div class="form-group">
+                                <label for="search-directory">
+                                    <i class="fas fa-folder"></i>
+                                    Dossier de recherche
+                                </label>
+                                <input type="text" 
+                                       id="search-directory" 
+                                       class="form-input"
+                                       placeholder="Chemin vers le dossier à explorer">
+                            </div>
+
+                            <div class="form-group">
+                                <label for="person-names">
+                                    <i class="fas fa-user"></i>
+                                    Nom(s) de personne(s)
+                                </label>
+                                <input type="text" 
+                                       id="person-names" 
+                                       class="form-input"
+                                       placeholder="Marie, Pierre, Jean (séparez par des virgules)">
+                            </div>
+
+                            <button type="submit" class="btn-primary btn-large">
+                                <i class="fas fa-search"></i>
+                                Rechercher
+                            </button>
+                        </form>
+                    </div>
+                </div>
+
+                <div class="search-results" id="search-results" style="display: none;">
+                    <div class="results-header">
+                        <h3 id="search-results-title">Résultats de recherche</h3>
+                        <div class="view-controls">
+                            <button class="view-btn active" data-view="grid">
+                                <i class="fas fa-th"></i>
+                            </button>
+                            <button class="view-btn" data-view="list">
+                                <i class="fas fa-list"></i>
+                            </button>
+                        </div>
+                    </div>
+                    <div class="search-gallery" id="search-gallery">
+                        <!-- Search results will be displayed here -->
+                    </div>
+                </div>
+            </section>
+        </div>
+    </main>
+
+    <!-- Loading Overlay -->
+    <div class="loading-overlay" id="loading-overlay" style="display: none;">
+        <div class="loading-spinner">
+            <i class="fas fa-spinner fa-spin"></i>
+            <p>Chargement en cours...</p>
+        </div>
+    </div>
+
+    <!-- Modal for Image Preview -->
+    <div class="modal" id="image-modal" style="display: none;">
+        <div class="modal-content">
+            <span class="modal-close" id="modal-close">&times;</span>
+            <img id="modal-image" src="" alt="Preview">
+            <div class="modal-info" id="modal-info"></div>
+        </div>
+    </div>
+
+    <!-- Toast Notifications -->
+    <div class="toast-container" id="toast-container"></div>    <script src="{{ url_for('static', filename='js/modern-app.js') }}"></script>
+</body>
+</html>

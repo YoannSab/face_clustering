@@ -108,12 +108,26 @@
     text-align: center;
 }
 
-.form-style input[type="text"] {
+#folderNameCluster {
     width: 70%;
     padding: 10px;
     margin: 10px 0;
     border: 1px solid #ccc;
     border-radius: 4px;
+}
+
+#clusterMethodDiv {
+    margin: 10px;
+    flex-grow: 1;
+    font-family: 'Courier New', Courier, monospace;
+    margin-bottom: 20px;
+
+}
+#params{
+    width: 100%;
+    margin-bottom: 20px;
+    border-radius: 4px;
+    font-family: 'Courier New', Courier, monospace;
 }
 
 .form-style button {
