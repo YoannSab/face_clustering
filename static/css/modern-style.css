@@ -180,6 +180,26 @@ body {
     color: var(--text-primary);
 }
 
+/* Step Cards */
+.step-description {
+    font-size: 0.9rem;
+    color: var(--text-secondary);
+    margin-bottom: 1.5rem;
+    font-style: italic;
+}
+
+.card.disabled {
+    opacity: 0.5;
+    pointer-events: none;
+}
+
+.card.enabled {
+    opacity: 1;
+    pointer-events: auto;
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 1px var(--primary-color), var(--shadow-md);
+}
+
 /* Grid Layouts */
 .content-grid {
     display: grid;
@@ -712,6 +732,127 @@ body {
         transform: translateX(0);
         opacity: 1;
     }
+}
+
+/* Extraction Status */
+.extraction-status {
+    margin: 1rem 0;
+    padding: 1rem;
+    border-radius: var(--border-radius);
+    background: var(--bg-secondary);
+    display: none;
+}
+
+.extraction-status.show {
+    display: block;
+}
+
+.extraction-status.success {
+    background: #f0fdf4;
+    border: 1px solid #bbf7d0;
+    color: #166534;
+}
+
+.extraction-status.error {
+    background: #fef2f2;
+    border: 1px solid #fecaca;
+    color: #dc2626;
+}
+
+.extraction-status h4 {
+    margin-bottom: 0.5rem;
+    font-size: 0.9rem;
+    font-weight: var(--font-weight-semibold);
+}
+
+.extraction-status p {
+    font-size: 0.85rem;
+    margin: 0;
+}
+
+/* Clustering Info */
+.clustering-info {
+    margin: 1rem 0;
+    padding: 1rem;
+    border-radius: var(--border-radius);
+    background: var(--bg-secondary);
+    border: 1px solid var(--border-color);
+    display: none;
+}
+
+.clustering-info.show {
+    display: block;
+}
+
+.clustering-info h4 {
+    margin-bottom: 0.5rem;
+    font-size: 0.9rem;
+    font-weight: var(--font-weight-semibold);
+    color: var(--text-primary);
+}
+
+.clustering-info .info-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+    gap: 1rem;
+    margin-top: 1rem;
+}
+
+.clustering-info .info-item {
+    text-align: center;
+}
+
+.clustering-info .info-value {
+    display: block;
+    font-size: 1.25rem;
+    font-weight: var(--font-weight-bold);
+    color: var(--primary-color);
+}
+
+.clustering-info .info-label {
+    font-size: 0.75rem;
+    color: var(--text-secondary);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+
+/* Progress Actions */
+.progress-actions {
+    display: flex;
+    justify-content: center;
+    gap: 1rem;
+}
+
+.progress-actions button {
+    min-width: 120px;
+}
+
+/* Step Indicators */
+.step-indicator {
+    display: flex;
+    align-items: center;
+    margin-bottom: 1rem;
+    font-size: 0.9rem;
+    color: var(--text-secondary);
+}
+
+.step-indicator i {
+    margin-right: 0.5rem;
+    color: var(--primary-color);
+}
+
+.step-indicator.completed i {
+    color: var(--success-color);
+}
+
+/* Animation for card transitions */
+.card {
+    transition: var(--transition-slow);
+}
+
+.card:hover:not(.disabled) {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-lg);
 }
 
 /* Responsive Design */

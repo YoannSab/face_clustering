@@ -105,3 +105,43 @@ class ClusteringService:
         except Exception as e:
             logger.error(f"Error in clustering: {e}")
             return np.array([]), []
+
+    @staticmethod
+    def organize_clusters(detections: List[Dict], labels: np.ndarray, paths: List[str]) -> Dict:
+        """Organize clustering results into a structured format"""
+        from app.config import Config
+        from app.utils.image_processor import ImageProcessor
+        from app.utils.cache_manager import convert_numpy_types
+        
+        clusters = {}
+        
+        for i, label in enumerate(labels):
+            # Convert numpy int64 to regular int
+            label = int(label) if hasattr(label, 'item') else label
+            
+            if label == -1:  # Noise/unclustered
+                continue
+            
+            if label not in clusters:
+                clusters[label] = {
+                    'faces': [],
+                    'paths': [],
+                    'count': 0
+                }
+            
+            clusters[label]['paths'].append(paths[i])
+            clusters[label]['count'] += 1
+            
+            # Add face images (limited number for performance)
+            if len(clusters[label]['faces']) < Config.MAX_FACES_PER_CLUSTER:
+                try:
+                    face_image, success = ImageProcessor.crop_face(
+                        paths[i], detections[i]['box']
+                    )
+                    if success:
+                        clusters[label]['faces'].append(face_image)
+                except Exception as e:
+                    logger.warning(f"Error cropping face from {paths[i]}: {e}")
+        
+        # Convert all numpy types in the clusters dictionary
+        return convert_numpy_types(clusters)

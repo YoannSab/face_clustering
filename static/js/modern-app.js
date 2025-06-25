@@ -11,6 +11,8 @@ class FaceClusteringApp {
         this.progressInterval = null;
         this.cache = new Map();
         this.clusterData = {}; // Store cluster data including paths
+        this.extractionCompleted = false; // Track if extraction is done
+        this.extractionCacheKey = null; // Store cache key from extraction
         
         this.init();
     }
@@ -23,7 +25,12 @@ class FaceClusteringApp {
     }
 
     setupEventListeners() {
-        // Main form submissions
+        // Form submissions - separate extraction and clustering
+        document.getElementById('extraction-form').addEventListener('submit', (e) => {
+            e.preventDefault();
+            this.startExtraction();
+        });
+
         document.getElementById('clustering-form').addEventListener('submit', (e) => {
             e.preventDefault();
             this.startClustering();
@@ -56,6 +63,10 @@ class FaceClusteringApp {
 
         document.getElementById('export-btn')?.addEventListener('click', () => {
             this.exportResults();
+        });
+
+        document.getElementById('cancel-btn')?.addEventListener('click', () => {
+            this.cancelProcess();
         });
 
         // Modal controls
@@ -210,7 +221,7 @@ class FaceClusteringApp {
         }
     }
 
-    async startClustering() {
+    async startExtraction() {
         if (this.isProcessing) return;
 
         const directory = document.getElementById('directory-input').value.trim();
@@ -220,29 +231,71 @@ class FaceClusteringApp {
         }
 
         this.isProcessing = true;
+        this.extractionCompleted = false;
         this.saveSettings();
-        this.showProgress();
+        this.showProgress('extraction');
+
+        try {
+            this.updateProgress(0, 'Initialisation de l\'extraction...');
+            
+            const response = await this.apiCall('/faces/extract', {
+                method: 'POST',
+                body: JSON.stringify({
+                    directory
+                })
+            });
+
+            this.hideProgress();
+            this.extractionCompleted = true;
+            this.showExtractionResults(response);
+            this.enableClusteringStep();
+            this.showToast('Extraction des visages terminée !', 'success');
+
+        } catch (error) {
+            this.hideProgress();
+            this.showExtractionError(error.message);
+            this.showToast(`Erreur lors de l'extraction: ${error.message}`, 'error');
+            console.error('Extraction error:', error);
+        } finally {
+            this.isProcessing = false;
+        }
+    }
+
+    async startClustering() {
+        if (this.isProcessing || !this.extractionCompleted) {
+            this.showToast('Veuillez d\'abord extraire les visages', 'warning');
+            return;
+        }
+
+        if (!this.extractionCacheKey) {
+            this.showToast('Données d\'extraction manquantes', 'error');
+            return;
+        }
+
+        this.isProcessing = true;
+        this.saveSettings();
+        this.showProgress('clustering');
 
         const params = this.getClusteringParams();
 
         try {
-            this.updateProgress(0, 'Initialisation...');
+            this.updateProgress(0, 'Regroupement des visages...');
             
             const response = await this.apiCall('/faces/cluster', {
                 method: 'POST',
                 body: JSON.stringify({
-                    directory,
+                    cache_key: this.extractionCacheKey,
                     ...params
                 })
             });
 
             this.hideProgress();
             this.displayResults(response);
-            this.showToast('Analyse terminée avec succès !', 'success');
+            this.showToast('Regroupement terminé avec succès !', 'success');
 
         } catch (error) {
             this.hideProgress();
-            this.showToast(`Erreur: ${error.message}`, 'error');
+            this.showToast(`Erreur lors du regroupement: ${error.message}`, 'error');
             console.error('Clustering error:', error);
         } finally {
             this.isProcessing = false;
@@ -263,12 +316,27 @@ class FaceClusteringApp {
         return params;
     }
 
-    showProgress() {
+    showProgress(stage = 'extraction') {
         document.getElementById('progress-panel').style.display = 'block';
         document.getElementById('results-section').style.display = 'none';
         
-        // Simulate progress for better UX
-        this.simulateProgress();
+        // Update progress title based on stage
+        const progressStage = document.getElementById('progress-stage');
+        const processedLabel = document.getElementById('processed-label');
+        const cancelBtn = document.getElementById('cancel-btn');
+        
+        if (stage === 'extraction') {
+            progressStage.textContent = 'Extraction en cours...';
+            processedLabel.textContent = 'Images traitées';
+        } else {
+            progressStage.textContent = 'Regroupement en cours...';
+            processedLabel.textContent = 'Visages regroupés';
+        }
+        
+        cancelBtn.style.display = 'block';
+        
+        // Start progress monitoring
+        this.startProgressMonitoring(stage);
     }
 
     hideProgress() {
@@ -302,7 +370,9 @@ class FaceClusteringApp {
     updateProgress(percentage, text) {
         document.getElementById('progress-fill').style.width = `${percentage}%`;
         document.getElementById('progress-text').textContent = text;
-    }    displayResults(data) {
+    }
+
+    displayResults(data) {
         const { clusters, statistics } = data;
         
         // Store cluster data for later use
@@ -669,6 +739,95 @@ class FaceClusteringApp {
             clearTimeout(timeout);
             timeout = setTimeout(later, wait);
         };
+    }
+
+    // New methods for two-step process
+    showExtractionResults(data) {
+        const statusDiv = document.getElementById('extraction-status');
+        statusDiv.classList.add('show', 'success');
+        
+        statusDiv.innerHTML = `
+            <h4><i class="fas fa-check-circle"></i> Extraction terminée</h4>
+            <p>${data.total_faces} visages détectés dans ${data.total_images} images</p>
+            <p>Cache d'embeddings mis à jour avec ${data.new_embeddings} nouveaux vecteurs</p>
+        `;
+
+        // Store cache key for clustering
+        this.extractionCacheKey = data.cache_key;
+    }
+
+    showExtractionError(message) {
+        const statusDiv = document.getElementById('extraction-status');
+        statusDiv.classList.add('show', 'error');
+        
+        statusDiv.innerHTML = `
+            <h4><i class="fas fa-exclamation-triangle"></i> Erreur d'extraction</h4>
+            <p>${message}</p>
+        `;
+    }
+
+    enableClusteringStep() {
+        const clusteringCard = document.getElementById('clustering-card');
+        const clusteringInfo = document.getElementById('clustering-info');
+        
+        clusteringCard.style.opacity = '1';
+        clusteringCard.style.pointerEvents = 'auto';
+        clusteringCard.classList.add('enabled');
+        
+        if (this.extractionCacheKey) {
+            clusteringInfo.classList.add('show');
+            clusteringInfo.innerHTML = `
+                <h4><i class="fas fa-info-circle"></i> Données prêtes pour le regroupement</h4>
+                <div class="info-grid">
+                    <div class="info-item">
+                        <span class="info-value">Prêt</span>
+                        <span class="info-label">Statut</span>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-value">512</span>
+                        <span class="info-label">Dimensions</span>
+                    </div>
+                </div>
+            `;
+        }
+    }
+
+    startProgressMonitoring(stage) {
+        this.progressInterval = setInterval(async () => {
+            try {
+                const status = await this.apiCall(`/progress/${stage}`);
+                this.updateProgress(status.percentage, status.message);
+                
+                // Update statistics based on stage
+                if (stage === 'extraction') {
+                    document.getElementById('processed-count').textContent = status.processed || 0;
+                    document.getElementById('faces-found').textContent = status.faces_found || 0;
+                } else if (stage === 'clustering') {
+                    document.getElementById('processed-count').textContent = status.clustered || 0;
+                    document.getElementById('faces-found').textContent = status.total_faces || 0;
+                }
+                
+                if (status.percentage >= 100) {
+                    clearInterval(this.progressInterval);
+                }
+            } catch (error) {
+                // Progress monitoring error, continue silently
+                console.warn('Progress monitoring error:', error);
+            }
+        }, 3000);
+    }
+
+    cancelProcess() {
+        if (this.progressInterval) {
+            clearInterval(this.progressInterval);
+        }
+        
+        // Call cancel API
+        this.apiCall('/cancel', { method: 'POST' }).catch(console.error);
+        
+        this.hideProgress();
+        this.isProcessing = false;
+        this.showToast('Processus annulé', 'info');
     }
 }
 

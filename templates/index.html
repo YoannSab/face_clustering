@@ -48,10 +48,12 @@
                 <div class="content-grid">
                     <!-- Configuration Panel -->
                     <div class="config-panel">
+                        <!-- Étape 1: Extraction des visages -->
                         <div class="card">
-                            <h3><i class="fas fa-cog"></i> Configuration</h3>
+                            <h3><i class="fas fa-scan"></i> Étape 1: Extraction des visages</h3>
+                            <p class="step-description">Analysez les photos et extrayez les visages avec FaceNet</p>
                             
-                            <form id="clustering-form" class="form-modern">
+                            <form id="extraction-form" class="form-modern">
                                 <div class="form-group">
                                     <label for="directory-input">
                                         <i class="fas fa-folder"></i>
@@ -70,6 +72,23 @@
                                     <div class="image-count" id="image-count"></div>
                                 </div>
 
+                                <div class="extraction-status" id="extraction-status">
+                                    <!-- Status will be updated here -->
+                                </div>
+
+                                <button type="submit" class="btn-primary btn-large" id="extraction-btn">
+                                    <i class="fas fa-eye"></i>
+                                    Extraire les visages
+                                </button>
+                            </form>
+                        </div>
+
+                        <!-- Étape 2: Clustering -->
+                        <div class="card" id="clustering-card" style="opacity: 0.5; pointer-events: none;">
+                            <h3><i class="fas fa-users"></i> Étape 2: Regroupement</h3>
+                            <p class="step-description">Regroupez les visages selon vos critères</p>
+                            
+                            <form id="clustering-form" class="form-modern">
                                 <div class="form-group">
                                     <label for="algorithm-select">
                                         <i class="fas fa-brain"></i>
@@ -119,9 +138,13 @@
                                     </div>
                                 </div>
 
-                                <button type="submit" class="btn-primary btn-large">
-                                    <i class="fas fa-play"></i>
-                                    Démarrer l'analyse
+                                <div class="clustering-info" id="clustering-info">
+                                    <!-- Infos sur les visages extraits -->
+                                </div>
+
+                                <button type="submit" class="btn-primary btn-large" id="clustering-btn">
+                                    <i class="fas fa-project-diagram"></i>
+                                    Regrouper les visages
                                 </button>
                             </form>
                         </div>
@@ -130,7 +153,10 @@
                     <!-- Progress Panel -->
                     <div class="progress-panel" id="progress-panel" style="display: none;">
                         <div class="card">
-                            <h3><i class="fas fa-spinner fa-spin"></i> Analyse en cours...</h3>
+                            <h3 id="progress-title">
+                                <i class="fas fa-spinner fa-spin"></i> 
+                                <span id="progress-stage">Extraction en cours...</span>
+                            </h3>
                             
                             <div class="progress-container">
                                 <div class="progress-bar">
@@ -142,7 +168,7 @@
                             <div class="progress-stats">
                                 <div class="stat">
                                     <span class="stat-value" id="processed-count">0</span>
-                                    <span class="stat-label">Images traitées</span>
+                                    <span class="stat-label" id="processed-label">Images traitées</span>
                                 </div>
                                 <div class="stat">
                                     <span class="stat-value" id="faces-found">0</span>
@@ -152,6 +178,13 @@
                                     <span class="stat-value" id="estimated-time">--</span>
                                     <span class="stat-label">Temps restant</span>
                                 </div>
+                            </div>
+
+                            <div class="progress-actions" style="margin-top: 1rem;">
+                                <button class="btn-secondary" id="cancel-btn" style="display: none;">
+                                    <i class="fas fa-stop"></i>
+                                    Annuler
+                                </button>
                             </div>
                         </div>
                     </div>
